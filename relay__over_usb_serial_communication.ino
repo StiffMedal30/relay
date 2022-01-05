@@ -1,20 +1,43 @@
-#define relayPin 8
+#define r 8
+#define st 4
 String command;
-
 void setup() {
   Serial.begin(9600);
-  pinMode(relayPin, OUTPUT);
+  pinMode(r, OUTPUT);
+  pinMode(st, OUTPUT);
 }
 
 void loop() {
-  if(Serial.available()){
-    command = Serial.readStringUntil('\n');
+  if (Serial.available()) {
+    command = Serial.readStringUntil("/n");
     command.trim();
     if (command.equals("on")) {
-      digitalWrite(relayPin, HIGH);
+      command = "";
+      pulse();
+      digitalWrite(st, HIGH);
     }
-    else if (command.equals("off")) {
-      digitalWrite(relayPin, LOW);
+    if (command.equals("off")) {
+      pulse();
+      digitalWrite(st, LOW);
     }
+
+    if (command.equals("status")) {
+      Serial.print(checkStatus());
+    }
+  }
+}
+
+void pulse() {
+  digitalWrite(r, HIGH);
+  delay(100);
+  digitalWrite(r, LOW);
+}
+
+String checkStatus() {
+  if (digitalRead(st) == 1) {
+    return "on";
+  }
+  if (digitalRead(st) == 0) {
+    return "off";
   }
 }
